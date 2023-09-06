@@ -3,10 +3,6 @@
 import koaRouter from "koa-router";
 const router = koaRouter();
 
-// debug声明,
-import { useDebug } from "../hooks/useDebug.js";
-const debug = useDebug();
-
 // 返回字符串结果
 router.get("/string", async (ctx, next) => {
   ctx.body = "koa2 string";

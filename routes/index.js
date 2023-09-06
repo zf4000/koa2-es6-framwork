@@ -2,9 +2,6 @@
 import koaRouter from "koa-router";
 const router = koaRouter();
 
-import { useDebug } from "../hooks/useDebug.js";
-const debug = useDebug();
-
 router.get("/", async (ctx, next) => {
   // await ctx.render("index", {
   //   title: "Hello Koa 2!",

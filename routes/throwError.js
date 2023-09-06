@@ -1,9 +1,6 @@
 import koaRouter from "koa-router";
 const router = koaRouter();
 
-import { useDebug } from "../hooks/useDebug.js";
-const debug = useDebug();
-
 // 错误处理触发
 router.get("/throwError", async (ctx, next) => {
   // 1.throw new error,会被koa-onerror捕获,在浏览器中显示友好的错误信息,否则只会看到500错误,
@@ -18,7 +15,7 @@ router.get("/throwError", async (ctx, next) => {
   // }, 1000);
 
   // 4,status错误,会被koa-onerror捕获
-  // ctx.throw(500, "500错误,会消失");
+  ctx.throw(500, "500错误,会消失");
   // ctx.body = { msg: "触发错误" };
 
   ctx.body = "错误触发";

@@ -1,13 +1,6 @@
 import Koa from "koa";
 const app = new Koa();
 
-import { useLogger } from "./hooks/useLogger.js";
-const _logger = useLogger();
-_logger.error("error 日志");
-
-import { useDebug } from "./hooks/useDebug.js";
-const debug = useDebug();
-
 //允许跨域
 import koa2 from "koa2-cors";
 app.use(koa2());
@@ -41,8 +34,8 @@ app.use(
 );
 
 // 每次路由请求在控制台打印日志
-import logger from "koa-logger";
-app.use(logger());
+import koaLogger from "koa-logger";
+app.use(koaLogger());
 
 // 静态资源
 import _static from "koa-static";
@@ -68,10 +61,5 @@ app.use(async (ctx, next) => {
 import useRoute from "./hooks/useRoute.js";
 const { loadAllRoute } = useRoute();
 loadAllRoute(app);
-
-// import index from "./routes/index.js";
-// import users from "./routes/users.js";
-// app.use(index.routes(), index.allowedMethods());
-// app.use(users.routes(), users.allowedMethods());
 
 export default app;

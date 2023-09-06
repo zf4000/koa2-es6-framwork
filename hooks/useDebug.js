@@ -7,6 +7,22 @@ debug 的主要功能包括：
 - debug('xxx')在 windows 下不会输出信息,必须通过 cross-env DEBUG=myapp nodemon bin/www.js 在设置了环境变量的基础上,才会有输出
 
 启动服务器时必须设置环境变量 DEBUG='命名空间',否则,debug信息不会显示
+
+使用示例:
+1. 
+pnpm i debug
+
+2.
+import { useDebug } from "../hooks/useDebug.js";
+const debug = useDebug();
+debug("这是调试信息,生产环境下不会显示");
+
+3.
+启动时必须 : cross-env DEBUG=myapp nodemon bin/www.js
+
+可以看到控制台输出红色的信息
+
+使用了log4js后,这个不太需要了,可以在生产环境中设置logger的级别为debug达到同样的效果
 */
 const spaceName = "myapp";
 
