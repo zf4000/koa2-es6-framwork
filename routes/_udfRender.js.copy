@@ -1,0 +1,20 @@
+/*
+  使用koa-views适合处理所有站点统一使用一套模板引擎的情况
+  也可以不使用koa-views包,通过自定义render函数来达到同样的目的
+*/
+import koaRouter from "koa-router";
+import pug from "pug";
+
+const router = koaRouter();
+
+// 自定义渲染函数
+const render = (template, data, ctx) => {
+  const html = pug.renderFile(`views/${template}`, data);
+  ctx.body = html;
+};
+
+router.get("/demo1", async (ctx, next) => {
+  const data = { name: "Hello, Pug222!" };
+  render("demo.pug", data, ctx);
+});
+export default router;

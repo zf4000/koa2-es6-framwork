@@ -1,0 +1,41 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title pug demo
+  body
+    #app
+      //- 变量
+      h1 模板变量name:#{name}
+      h1 vue变量count:{{count}}
+      h1 computed变量:{{ computedCount }} 
+
+      //- 事件
+      button(@click="handleClick") count++ 
+        
+      //- 带属性写法,style,class等
+      h1(style='background-color:#ccc;') 属性(style,class)写法
+      h1(class='my-class') 带class写法
+      
+    script.
+      new Vue({
+        el: '#app',
+        data: {
+          count: 0
+        },
+        methods:{
+          handleClick(){
+            this.count++
+          }
+        },
+        computed: {
+          computedCount() {
+            return this.count*2
+          }
+        }
+      })
+    style.
+      .my-class {
+        background-color:lightgreen;
+      }

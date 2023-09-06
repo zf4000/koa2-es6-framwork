@@ -1,0 +1,72 @@
+{
+  "javascript.suggest.autoImports": true,
+
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.options": {
+    "configFile": "${workspaceFolder}/.eslintrc.json",
+    "extensions": [".js", ".jsx", ".ts", ".tsx"]
+  },
+
+  "files.eol": "\n",
+  "files.associations": {
+    "editor.snippetSuggestions": "top"
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.tabSize": 2,
+  "editor.formatOnPaste": true,
+  "editor.suggestSelection": "first",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.linkedEditing": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.guides.bracketPairs": "active",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.fontSize": 16,
+
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "css.lint.propertyIgnoredDueToDisplay": "ignore",
+
+  "git.confirmSync": false,
+
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorTheme": "One Dark Pro Darker",
+  "workbench.startupEditor": "newUntitledFile",
+  "editor.bracketPairColorization.enabled": true,
+  "workbench.colorCustomizations": {
+    "editorBracketHighlight.foreground1": "#ffd700",
+    "editorBracketPairGuide.activeBackground1": "#ffd7007f",
+    "editorBracketHighlight.foreground2": "#da70d6",
+    "editorBracketPairGuide.activeBackground2": "#da70d67f",
+    "editorBracketHighlight.foreground3": "#87cefa",
+    "editorBracketPairGuide.activeBackground3": "#87cefa7f",
+    "editorBracketHighlight.foreground4": "#ffd700",
+    "editorBracketPairGuide.activeBackground4": "#ffd7007f",
+    "editorBracketHighlight.foreground5": "#da70d6",
+    "editorBracketPairGuide.activeBackground5": "#da70d67f",
+    "editorBracketHighlight.foreground6": "#87cefa",
+    "editorBracketPairGuide.activeBackground6": "#87cefa7f",
+    "editorBracketHighlight.unexpectedBracket.foreground": "#ff0000"
+  }
+}

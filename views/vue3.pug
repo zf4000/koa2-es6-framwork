@@ -1,0 +1,31 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title pug demo
+  body
+    #app
+      div vue3模板
+      
+    script.
+      new Vue({
+        el: '#app',
+        data: {
+          count: 0
+        },
+        methods:{
+          handleClick(){
+            this.count++
+          }
+        },
+        computed: {
+          computedCount() {
+            return this.count*2
+          }
+        }
+      })
+    style.
+      .my-class {
+        background-color:lightgreen;
+      }
