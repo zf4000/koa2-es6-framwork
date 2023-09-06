@@ -22,5 +22,11 @@ router.get("/", async (ctx, next) => {
   });
 });
 
+router.get("/pdf", async (ctx, next) => {
+  await ctx.render("throttleRequest", {
+    test: "节流请求,pdf的生成",
+  });
+});
+
 // module.exports = router;
 export default router;
