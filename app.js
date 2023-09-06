@@ -1,6 +1,10 @@
 import Koa from "koa";
 const app = new Koa();
 
+import { useLogger } from "./hooks/useLogger.js";
+const _logger = useLogger();
+_logger.error("error 日志");
+
 import { useDebug } from "./hooks/useDebug.js";
 const debug = useDebug();
 
