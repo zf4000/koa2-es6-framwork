@@ -1,0 +1,173 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title pug demo
+  body
+    #app
+      div 详细功能流程说明参考readme文档
+      div(class='my-class') 
+        button(@click="reset") 重置任务  
+        button(@click="exportAll") 完整测试:导出全部
+        //- 状态
+        div(class='percent') 报告处理中: 
+          span(style="color:red;") {{isProcessing?'处理中':'未处理'}}
+        div(class='percent') 进度: 
+          span(style="color:red;") {{overTask}}/{{totalTask}}
+        div(class='divOver') 页面渲染完成:
+          span(style="color:red;") {{renderOver}}
+      div(class='ids') 
+        span(style="font-weight:bold;") 所有id
+        div {{ids}}
+      //- div(class='idBlocks') 
+      //-   span(style="font-weight:bold;") 服务器返回reportData:
+      //-   template(v-for="item,index in reportData" )            
+      //-       div {{index+1}}: {{item}}
+      div(v-if="renderOver")
+        span(style="font-weight:bold;") pdf下载
+        div 已生成文件-{{pdfFilePath}}
+        button(@click="showPdf") 下载
+    script.     
+      //- 思路参考readme文档
+      //- 删除一个月前的pdf
+      const _removePdf=()=>{
+        const api="http://localhost:3000/removePdf";
+        //- 因为需要异步处理很长时间,这里不用等待了
+        const res = axios.post(api).then(({data})=>{
+          if(!data.success) {
+            throw new Error('删除pdf失败');
+          }
+          console.log('删除一个月前的pdf ok');
+        })
+      }
+      
+      let timer = null;
+      new Vue({
+        el: '#app',
+        data: {
+          ids:[],
+          idBlocks:[],
+          renderOver:false,
+          reportData:[],
+          totalTask :0,
+          overTask:0,
+          isProcessing:false,
+          pdfFilePath:'',
+        },
+        mounted(){
+          this.getSeviceStatu();
+        },
+        methods:{
+          //- 同步服务器状态
+          async getSeviceStatu(){
+            const api = "http://localhost:3000/getSeviceStatu";
+            const {data} = await axios.post(api);
+            if(!data.success) {
+              throw new Error(data.msg);
+            }
+            const {overTask,totalTask,isProcessing,pdfFilePath} = data.data;
+            console.log('获得pdf服务状态:',data.data)
+            this.overTask = overTask
+            this.totalTask = totalTask
+            this.isProcessing = isProcessing
+            this.pdfFilePath = pdfFilePath
+          },
+
+          async exportAll(){
+            //- 删除1个月前的
+            _removePdf();
+
+            //- '前端页面传递filter,获得ids集合'
+            console.log('前端页面请求php,传递filter,获得ids,这里使用promise模拟');
+            const requestPhp = ()=>{
+              return new Promise(resolve=>{
+                setTimeout(() => {
+                  const ids = [];
+                  for(i=1;i<101;i++) {
+                    ids.push(i);
+                  }
+                  return resolve(ids);
+                },1000)
+              });
+            }
+            const ids = await requestPhp();
+            console.log('从php获得ids成功');
+            this.ids = ids;
+
+            // 请求nodesj服务,传递ids
+            console.log('请求nodejs,获得pdf文件')
+            const api="http://localhost:3000/pdfmake";
+            //- 因为需要异步处理很长时间,这里不用等待了
+            const res = axios.post(api,{ids}).then(({data})=>{
+              if(data.success===false) {
+                clearTimeout(timer);
+                throw new Error(data.msg);
+              }
+              console.log('服务器响应:',data);
+              // 返回分片结果
+              //- this.idBlocks = data.idBlocks;
+            });
+
+            // 页面中反馈报告处理进度,完成后显示一个下载按钮
+            this.startWatchPercent();
+          },
+          //- 重置状态
+          reset() {
+            const api = "http://localhost:3000/reset";
+            const res = axios.post(api).then(({data})=>{
+              if(!data.success) {
+                throw new Error(data.msg)
+              }
+              clearTimeout(timer);
+              this.getSeviceStatu();
+              this.renderOver = false;
+            });
+          },
+          //- 轮询查看后台pdf处理进度
+          startWatchPercent(){
+            //- 初始化
+            this.renderOver = false;
+            
+            const getPercent = ()=>{
+              clearTimeout(timer);
+              timer = setTimeout(async () => {
+                await this.getSeviceStatu();
+                if(this.overTask>=this.totalTask){
+                  this.renderOver = true;
+                  console.log('处理完成');
+                  return ;
+                }
+                getPercent();
+              },1000);
+            }
+
+            getPercent();
+          },
+          //- throttleRequest,
+          showPdf(){
+            //- console.log('http://localhost:3000/pdfFiles/'+this.pdfFilePath);
+            window.open('http://localhost:3000/pdfFiles/'+this.pdfFilePath)
+          }
+        },
+      })
+    style.
+      .my-class {
+        background-color:lightgreen;
+        padding:8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .container {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
+
+      .report-view {
+        background-color : #ddd;
+        margin-top:4px;
+      }
+
+      .divOver {
+      }

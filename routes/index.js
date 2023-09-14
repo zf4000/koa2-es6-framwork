@@ -22,8 +22,8 @@ router.get("/", async (ctx, next) => {
   });
 });
 
-router.get("/pdf", async (ctx, next) => {
-  await ctx.render("throttleRequest", {
+router.all("/pdf", async (ctx, next) => {
+  await ctx.render("pdfMaker", {
     test: "节流请求,pdf的生成",
   });
 });

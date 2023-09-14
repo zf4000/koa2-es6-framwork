@@ -3,6 +3,17 @@
 import koaRouter from "koa-router";
 const router = koaRouter();
 
+// post
+router.post("/post", async (ctx, next) => {
+  // 获得post参数
+  const post = ctx.request.body;
+  if (!post) {
+    return;
+  }
+  console.log("post参数", post);
+  ctx.body = { success: true, msg };
+});
+
 // 返回字符串结果
 router.get("/string", async (ctx, next) => {
   ctx.body = "koa2 string";

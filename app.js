@@ -34,8 +34,8 @@ app.use(
 );
 
 // 每次路由请求在控制台打印日志
-import koaLogger from "koa-logger";
-app.use(koaLogger());
+// import koaLogger from "koa-logger";
+// app.use(koaLogger());
 
 // 静态资源
 import _static from "koa-static";
@@ -50,12 +50,12 @@ app.use(
 );
 
 // 路由请求在控制台显示日志
-app.use(async (ctx, next) => {
-  const start = new Date();
-  await next();
-  const ms = new Date() - start;
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
-});
+// app.use(async (ctx, next) => {
+//   const start = new Date();
+//   await next();
+//   const ms = new Date() - start;
+//   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
+// });
 
 // 自动载入routes所有的路由
 import useRoute from "./hooks/useRoute.js";

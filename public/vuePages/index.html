@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .report-wrapper {
+      border: 1px solid #ccc;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <button @click="test">test</button>
+    <!-- 状态元素 -->
+    <div class="is-rend-over" v-if="rendOver">渲染完成:{{rendOver}}</div>
+    <!-- 报告区域 -->
+    <div class="report-container">
+      <div v-for="item,index in reportData" :key="index">
+        <component v-if="computedAsyncComps[item.printTpl]" :is="computedAsyncComps[item.printTpl]" v-bind="item" />
+      </div>
+    </div>
+
+  </div>
+  <script src="/javascripts/vue_3.3.4.js"></script>
+  <script src="/javascripts/vue3-sfc-loader.js"></script>
+  <script type="module">
+    import { throttleRequest, sfcLoader, appenMethod } from "./main.js";
+    const { createApp, ref, shallowRef, nextTick, computed } = Vue;
+
+    const app = createApp({
+      setup() {
+        const rendOver = ref(false);
+        const message = ref('messge content')
+        const reportData = ref([]);
+        const asyncComps = {};
+
+        // 用computed包裹一层是为了防止模板中使用时报错:
+        // Vue received a Component which was made a reactive object. This can lead to unnecessary performance overhead, and should be avoided by marking the component with `markRaw` or using `shallowRef` instead of `ref`.
+        const computedAsyncComps = computed(() => {
+          return asyncComps;
+        })
+
+        // 启动消费请求
+        const startConsume = () => {
+          // 分批请求后台获得报告内容, 可能包括不同的报告模板
+          // 根据报告内容中的模板信息载入报告sfc模板 - 异步组件并缓存起来, 传入报告内容
+          // 报告内容渲染到容器中
+          // 渲染完毕后修改状态元素
+          const tasks = window.params.ids
+          debug('开始消费', tasks);
+
+          debug('开始分批请求,获得报告内容');
+          throttleRequest(window.params.ids, async (reports) => {
+            debug('throttleRequest over,最终报告结果:', reports.length)
+
+            reportData.value = reports;
+
+            // 根据最终报告中不同模板,构造sfc-loader
+            const uniqueTpl = [...new Set(reports.map(item => item.printTpl))];
+            for (let i = 0; uniqueTpl[i]; i++) {
+              const key = uniqueTpl[i];
+              const comp = await sfcLoader(key);
+              asyncComps[key] = comp;
+            }
+            debug('打印模板sfc载入完成', asyncComps);
+
+            // 渲染完成后修改状态,触发puppeteer的pdf打印
+            nextTick(() => {
+              debug('渲染完成,改变状态元素');
+              rendOver.value = true;
+            })
+          });
+        }
+
+        // window上绑定 startConsume,setparam,debug等方法
+        appenMethod(window, { startConsume })
+
+        return {
+          rendOver,
+          message,
+          reportData,
+          // asyncComps,
+          getComp(key) {
+            const item = asyncComps[key];
+            return item;
+          },
+          computedAsyncComps,
+          test: () => {
+            const _ids = [];
+            for (let i = 1; i < 32; i++) {
+              _ids.push(i);
+            }
+            setparam({ ids: _ids })
+            startConsume();
+          }
+        };
+      },
+    });
+    app.mount("#app");
+  </script>
+</body>
+
+</html>

@@ -24,6 +24,7 @@
     "pug": "^3.0.2"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "puppeteer": "^21.1.1"
   }
 }
