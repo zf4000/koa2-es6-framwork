@@ -59,14 +59,6 @@ koa-onerror 是一个用于捕获 Koa 应用程序中错误并输出错误信息
 koa-views 是一个用于在 Koa 应用程序中渲染模板的中间件。它支持多种模板引擎，例如 EJS、Pug 和 Handlebars 等，可以将模板与数据结合起来生成 HTML 页面。koa-views 提供了一个简单的 API，使开发者可以轻松地将模板渲染成 HTML，并将其作为响应发送给客户端。
 你也可以不使用 koa-views 来进行模板渲染,参考 noViews.js,
 
-## todo
-
-### vue3 模板
-
-### tailwind 支持
-
-### 生产环境下,定义 log4js 的 logger 级别为 debug,输出一些 debug 级别的信息
-
 cross-env 设置启动时的环境变量
 process.env 能看到环境变量
 
@@ -106,9 +98,29 @@ process.env 能看到环境变量
   > 可设置@print 和固定表头
 
 - 开发须知
+
   > pupetter 打开的页面是一个 crm 框架中的顶级路由(#/sfcLoad),这个顶级路由只负责从 crm/public 目录下载入 sfc 文件
   > 根据项目需要开发打印预览页面-sfc 文件,放在 crm/public 目录下,
   > 这个页面可以使用 tailwindcss 等框架包,符合开发习惯
   > 在 lis 项目中,这个预览页面还需要根据报告内容中的打印模板字段,从 public 目录中再次载入打印模板(sfc)-嵌套载入 sfc,可以将 vue3-sfc-loader 作为模块传递.
   > 调整打印格式时,可以直接在 web 项目开发模式下进行调试,
   > 代码中使用 debug 可以将调试信息输出到 nodejs 控制台,很有用
+
+### pdf 导出测试
+
+- 如何调试 web 项目中的预览页面
+  puppeteer 会打开 sfcLoader 路由,
+  puppeteer 增加 window.params 对象,加入属性:{ids,sfcLoader 路由,previewUrl-public 文件}
+  sfcLoader.vue 会载入预览组件: window.params.previewUrl
+  预览组件再分批消费 window.params.ids
+
+- 调试预览页面时,
+  浏览器输入/sfcLoader 路由,
+  sfcLoader 中判断是否 puppeteer 环境,
+  如果不是 puppeteer 会自动从 /public/pdf/appendWindowMethods.ts 中载入测试数据,并绑定方法到 window 对象上
+  getTestData 函数中,一般,需要加入人工设置 windows.params 变量(ids,previewUrl,等),增加 window.debug 函数等方便进行 vue 文件调试
+
+## to do
+
+- 导出文件目前只能时 test1.pdf,
+- 页面尺寸,打印方向,边距,页码等设置和传递

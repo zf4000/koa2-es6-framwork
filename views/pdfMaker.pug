@@ -99,14 +99,20 @@ html
             console.log('请求nodejs,获得pdf文件')
             const api="http://localhost:3000/pdfmake";
             //- 因为需要异步处理很长时间,这里不用等待了
-            const res = axios.post(api,{ids}).then(({data})=>{
+            const res = axios.post(api,{
+              //- 需要处理的报告id
+              ids,
+              //- sfc载入器地址,puppeteer打开
+              //- sfcLoader:'http://localhost:8848/#/sfcLoader',
+              sfcLoader:'http://localhost:3000/vuePages/index.html',
+              //- sfcloader中需要载入的报告预览地址(vue文件)
+              previewUrl:'public/preview.vue'
+            }).then(({data})=>{
               if(data.success===false) {
                 clearTimeout(timer);
                 throw new Error(data.msg);
               }
               console.log('服务器响应:',data);
-              // 返回分片结果
-              //- this.idBlocks = data.idBlocks;
             });
 
             // 页面中反馈报告处理进度,完成后显示一个下载按钮

@@ -22,8 +22,8 @@ let pdfFilePath = "";
 */
 import { usePuppeteer } from "../hooks/usePuppeteer.js";
 
-const _startConsum = (ids) => {
-  console.log("开始消费", ids.length, "个id");
+const _startConsum = (post) => {
+  console.log("开始消费", post.ids.length, "个id");
 
   // 初始化状态
   isProcessing = true;
@@ -32,22 +32,18 @@ const _startConsum = (ids) => {
 
   // 打开无头浏览器
   openPuppeteer({
-    url: "http://localhost:3000/vuePages/index.html",
+    url: post.sfcLoader,
     saveAs: "test1.pdf",
     pageSize: "A5",
     landscape: false, //是否横向
     // 需要传入到窗口的参数
     params: {
-      ids,
+      ...post,
     },
     // 每次从后台请求报告内容后的处理,改变进度内容
     onResponse(reports) {
-      // console.log("php返回了", reports.length, "个报告结果");
+      console.log("php返回了", reports.length, "个报告结果");
       overTask += reports.length;
-      if (totalTask == overTask) {
-        // 处理完了可以下载
-        // isProcessing = false;
-      }
     },
     // 导出pdf完成后触发
     onSave(path) {
@@ -55,14 +51,6 @@ const _startConsum = (ids) => {
       pdfFilePath = path;
     },
   });
-
-  // 传入需要处理的id
-
-  // 获得处理进度
-
-  // 完成后导出pdf
-
-  // 改变状态元素
 };
 const _resetStatus = () => {
   isProcessing = false;
@@ -72,6 +60,15 @@ const _resetStatus = () => {
 };
 
 const { openPuppeteer } = usePuppeteer();
+
+// 浏览器可访问
+router.all("/pdf", async (ctx, next) => {
+  await ctx.render("pdfMaker", {
+    test: "节流请求,pdf的生成",
+  });
+});
+
+// 导出按钮点击后触发请求
 router.post("/pdfmake", async (ctx, next) => {
   //判断是否处理中
   if (isProcessing) {
@@ -80,14 +77,20 @@ router.post("/pdfmake", async (ctx, next) => {
   }
 
   const post = ctx.request.body;
-  const ids = post.ids;
-  totalTask = ids.length;
 
-  _startConsum(ids);
+  // post中包含以下参数
+  // { ids, sfcLoader, previewUrl }
+  // ids([]),需要处理的报告id
+  // sfc载入器(vue文件),puppeteer打开的地址,一般放在web项目的public目录中
+  // previewUrl(vue文件):载入器默认载入的报告预览页面,一般放在web项目的public目录中
+
+  totalTask = post.ids.length;
+
+  _startConsum(post);
 
   ctx.body = {
     post,
-    ids,
+    // ids,
   };
 });
 

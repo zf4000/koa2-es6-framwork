@@ -22,7 +22,7 @@ router.get("/", async (ctx, next) => {
   });
 });
 
-router.all("/pdf", async (ctx, next) => {
+router.all("/all", async (ctx, next) => {
   await ctx.render("pdfMaker", {
     test: "节流请求,pdf的生成",
   });

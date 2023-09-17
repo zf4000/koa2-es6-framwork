@@ -138,11 +138,17 @@ export const sfcLoader = async (fileName) => {
 
 // 绑定方法到windows,供nodejs调用
 export const appenMethod = (target, args) => {
-  window.setparam = (params) => {
-    window.params = params;
+  target.debug ??= console.warn;
+  target.setparam = (params) => {
+    target.debug("参数绑定到window:", params);
+    target.params = params;
   };
-  window.debug ??= console.warn;
 
+  target.debug("method绑定到window:", [
+    "debug",
+    "setparam",
+    ...Object.keys(args),
+  ]);
   for (const k in args) {
     target[k] = args[k];
   }
