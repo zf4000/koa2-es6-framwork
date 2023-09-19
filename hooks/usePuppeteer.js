@@ -90,14 +90,17 @@ const openPuppeteer = async (_options) => {
     // 页眉模板（图片使用base64，此处的src的base64为占位值）
     const headerTemplate = `<div
 style="width: calc(100% - 28px); margin-top: -13px; font-size:8px;border-bottom:2px solid #e1dafb;padding:6px 14px;display: flex; justify-content: space-between; align-items:center;">
-<span style="color: #9a7ff7; font-size: 12px; font-family: my-font;">李钟航的报告模板</span>
-<img style="width: 80px; height: auto;" src="data:image/png;base64,iVBORw0KGgoAAAxxxxxx" />
+<span style="color: #9a7ff7; font-size: 12px; font-family: my-font;">后面显示的base64图片</span>
+<span>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNkYPhfz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC" />
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FAAhKDveksOjmAAAAAElFTkSuQmCC" />
+</span>
 </div>`;
     // 页脚模板（pageNumber处会自动注入当前页码）
     const footerTemplate = `<div 
 style="width:calc(100% - 28px);margin-bottom: -20px; font-size:8px; padding:15px 14px;display: flex; justify-content: space-between; ">
 <span style="color: #9a7ff7; font-size: 10px;">这里是页脚文字</span>
-<span style="color: #9a7ff7; font-size: 13px;" class="pageNumber"></span> /<span class='totalPages'></span>
+<div><span style="color: #9a7ff7; font-size: 13px;" class="pageNumber"></span> / <span class='totalPages'></span></div>
 </div>`;
     const pdfOptions = {
       // pdf存储单页大小
