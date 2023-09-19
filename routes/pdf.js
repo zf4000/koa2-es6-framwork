@@ -57,6 +57,7 @@ const _resetStatus = () => {
   totalTask = 0;
   // totalBlock = 0;
   overTask = 0;
+  pdfFilePath = "";
 };
 
 const { openPuppeteer } = usePuppeteer();
