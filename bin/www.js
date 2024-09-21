@@ -71,8 +71,9 @@ const server = http.createServer(app.callback());
 
 // 增加ws服务
 import { useSocketIo } from "../hooks/useSocketIo.js";
-const { bindHttpServer } = useSocketIo();
+const { bindHttpServer, createSocketServer } = useSocketIo();
 bindHttpServer(server);
+createSocketServer(); //自动创建server
 
 server.listen(port, () => {
   const addr = server.address();

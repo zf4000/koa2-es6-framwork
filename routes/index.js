@@ -178,18 +178,10 @@ router.post("/cron/update", (ctx) => {
 //#region ws测试
 // 创建ws server
 import { useSocketIo } from "../hooks/useSocketIo.js";
-const {
-  createSocketServer,
-  broadcast,
-  getIoLevel,
-  getScocket,
-  getIo,
-  broadcastNsp,
-  broadcastRoom,
-} = useSocketIo();
+const { broadcast, getIoLevel, getScocket, broadcastNsp, broadcastRoom } =
+  useSocketIo();
 
 // 测试代码
-createSocketServer(); //自动创建server
 
 // 得到服务端的层级结构
 router.post("/ws/getNspLevel", (ctx) => {
