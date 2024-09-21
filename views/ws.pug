@@ -1,0 +1,203 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    //- socket.io服务端启动后,自动创建的虚拟文件
+    script(src='/socket.io/socket.io.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title ws test
+  body
+    #app
+      div(class='msg') ws测试页面
+        div 
+          h3 原理:
+          li namespace和room的区别 
+            div 参考 https://blog.csdn.net/linwenhao/article/details/114384584
+            div 每个命名空间的事件,房间等都是隔离开
+          li 一个server(io)对应多个namespace(频道/地区)
+            div Socket.IO 中的命名空间提供了一种将应用程序划分为不同通信通道的方法。当你想在同一应用程序中支持不同类型的交互或数据交换，而又不想让它们相互干扰时
+            div 这种设计可节约tcp连接开销,如聊天室应用中的独立聊天室
+          li 一个namespace包含多个room
+          li 每个socket连接时都会有个默认room(默认以socket.id命名),
+          li 每个room包含多个socket,1个socket可能存在于多个room中
+          li 1个server对应多个client
+          li 1个client对应多个socket(比如聊天室中一个用户进入多个房间)
+          li 参考 https://socket.io/zh-CN/docs/v4/server-api/
+
+      div(class='content')
+        //- button(@click="createServer") 创建服务端
+        button(@click="createClient('/','roomB')") 创建/客户端
+        button(@click="createClient('/jeff','roomB')") 创建/jeff/客户端
+        button(@click="getServerNsp") 刷新命名空间结构
+        div {{newPantou}}
+      div(class="title") 
+        h3 server状态-{{isServerOpen()?'开启':'关闭'}}
+      div(class="namespace" v-for="_ns,nsIndex in nsp" :key="nsIndex") 
+        span 命名空间:{{_ns.name}}
+        button(@click="makeNspMsg(_ns.name)") 通知服务器广播消息
+        div(class="room" v-for="room,roomIndex in _ns.rooms" :key="roomIndex") 
+          span 房间名:{{room.name}}
+          button(@click="makeRoomMsg(_ns.name,room.name)") 通知服务器广播消息
+          div(class="socket" v-for="socket,socketIndex in room.sockets" :key="socketIndex") 
+            span socket id:{{socket.id}} 
+            button(@click="getClientSocket(socket.id)") 客户端socket详细
+            button(@click="getServerSocket(socket.id)") 服务端socket详细
+            button(@click="sendMsg(socket.id)") 发消息给服务器
+            button(@click="makeServerMsg(socket.id)") 通知服务器发消息
+            button(@click="makeNewPantou(socket.id)") 通知服务器创建新盘头
+            div(class='event-wrap')
+              div(class="event") 新消息:{{newMsg[socket.id]}}
+              div(class="event") 新盘头:{{newPantou[socket.id]?.length>0?`发现${newPantou[socket.id].length}个新盘头`:""}}
+    script.
+      const sockets = [
+        {id:'111'},
+        {id:'222'},
+      ];
+      const rooms = [
+        {name:'room1',sockets},
+        {name:'room2',sockets},
+      ];
+      const nsp = [
+        {name:'namespace1',rooms},
+        {name:'namespace2',rooms},
+      ];
+
+      // 注册socket事件
+      const registerEvent = function(socket,cb){
+        //- 连接建立后触发,
+        socket.on('connect',()=>{          
+          cb?.();
+        });
+        
+        // 接收服务器新消息-为避免和默认事件冲突加入$
+        socket.on('$message', (data) => {
+            console.log(socket.id,'Received message from server:', data);
+            this.$set( this.newMsg,socket.id,data.msg)
+        });
+        // 收到新盘头-为避免和默认事件冲突加入$
+        socket.on('$newPantou', (data) => {
+            console.log(socket.id,'收到新盘头:', data);
+            this.$set( this.newPantou,socket.id,data.pantous)
+        });
+        // 转发服务器的指令到PLC-为避免和默认事件冲突加入$
+        socket.on('$plcCommand', (data) => {
+            console.log(socket.id,'收到 plcCommand:', data);
+        });
+      }
+      const __sockets = {};
+      new Vue({
+        el: '#app',
+        data(){
+          return {
+            nsp,
+            newMsg:{},//接收服务器端的最新消息
+            newPantou:{},
+            //- sockets:{}
+          }
+        },
+        mounted(){
+          //- 自动创建一个client
+          this.createClient('/','jeff room');
+          //- registerEvent.bind(this);
+        },
+        methods:{
+          //- 获得服务端命名空间结构
+          getServerNsp:function(){
+            axios.post('/ws/getNspLevel').then(({data})=>{
+              const {nsp} = data;
+              this.nsp = nsp;
+            });
+          },
+          //- 创建连接 nsp命名空间,roomId房间号
+          createClient:function(nsp,roomId){
+            if(!this.isServerOpen()) {
+              throw new Error('服务端未开启');
+            }
+            //- io('/')表示加入namespace '/' ,服务端可以根据namespace进行广播和发消息等
+            const socket = io(nsp);
+            registerEvent.apply(this,[socket,()=>{
+              __sockets[socket.id] = socket;
+              console.log('client socket connect',`${nsp}:${roomId}/${socket.id}`);
+              //- 通知服务器换房间
+              roomId && socket.emit('$changeRoom',roomId);
+              //- 重新获取nsp
+              this.getServerNsp();
+            }])
+          },
+          //- 服务端是否开启
+          isServerOpen:function(){
+            return window.io?true:false;
+          },
+          makeServerMsg:(socketId)=>{
+            axios.post('/ws/makeServerMsg',{socketId}).then(({data})=>{
+              console.log(data);
+            })
+          },
+          getServerSocket:(socketId)=>{
+            axios.post('/ws/getServerSocket',{socketId}).then(({data})=>{
+              console.log(data);
+            })
+          },
+          getClientSocket:(socketId)=>{
+            console.log(__sockets[socketId]);
+          },
+          makeNewPantou:(socketId)=>{
+              axios.post('/ws/makeNewPantou',{socketId}).then(({data})=>{
+              console.log(data);
+            })
+          },
+          sendMsg:(id)=>{
+            const socket = __sockets[id];
+            // 发送消息给服务器
+            socket.emit('$message', 'Hello, Server!');
+            console.log('请在服务端控制台查看收到消息')
+          },
+          makeNspMsg:(nsp)=>{
+            axios.post('/ws/makeNspMsg',{nsp}).then(res=>{
+              console.log(res);
+            })
+          },
+          makeRoomMsg:(nsp,room)=>{
+            axios.post('/ws/makeRoomMsg',{nsp,room}).then(res=>{
+              console.log(res);
+            })
+          }
+        }
+      })
+    style.
+      .content {
+        display:flex;
+        flex: 1 1 0%;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .msg div {
+        padding-left:10px;
+      }
+
+      .title {
+        font-weight:bold;
+      }
+      .namespace {
+        background-color:#ddd;
+        padding:8px;
+        margin-top:4px;
+      }
+      .namespace .room {
+        padding-left:8px;
+      }
+      .namespace .room .socket {
+        padding-left:16px;
+      }
+      .event-wrap {
+        margin-left:24px;
+        display:flex;
+        flex: 1 1 0%;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .event-wrap .event {
+        width:auto;
+        color:white;
+        background-color:green;
+      }

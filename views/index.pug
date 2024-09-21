@@ -1,25 +1,50 @@
-extends layout
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title koa2-es6-framework
+  body
+    #app
+      //- //- 变量
+      //- h1 模板变量name:#{name}
+      //- h1 vue变量count:{{count}}
+      //- h1 computed变量:{{ computedCount }} 
 
-block content
-  h1 后台声明了模板变量后,可以在模板中以模板变量\#{变量} 或者 js变量 ${变量} 的形式使用
-  h1 pug基本语法
-    h3 直接显示静态html元素: h3 xxx
-    h3= '显示模板变量:h3= 模板变量名'
-    h3= `js字串模板:h3= \`\${title}\``
-    h3 直接在pug字串中用\#{title}代表模板变量: 静态文字+模板变量(#{title})
-  h1 ctx参数相关
-    h3= "ctx.url:#{ctx.url}"
-    h3 ctx.querystring: #{ctx.querystring}
-    h3= `ctx.query: ${JSON.stringify(ctx.query)}`
-  h1 请求参数相关ctx.request
-    h3 request.origin: #{ctx.request.origin}
-    h3 request.originalUrl: #{ctx.request.originalUrl}
-    h3 request.href: #{ctx.request.href}
-    h3 request.path: #{ctx.request.path}
-    h3 request.method: #{ctx.request.method}
-    h3 request.url: #{ctx.request.url}
-    h3 request.header.hos: #{ctx.request.header.host}
-    h3 request.method: #{ctx.request.method}
-  h1 请求参数相关ctx.response
-    h3 response.status: #{ctx.response.status}
-    h3 response.message: #{ctx.response.message}
+      //- //- 事件
+      //- button(@click="handleClick") count++ 
+        
+      //- //- 带属性写法,style,class等
+      //- h1(style='background-color:#ccc;') 属性(style,class)写法
+      //- h1(class='my-class') 带class写法
+      h3 功能清单
+        div(class='content') 
+          a(href='/help') 使用帮助
+          a(href='/spawn') 计划调度+spawn执行dos命令
+    script.
+      new Vue({
+        el: '#app',
+        data: {
+          count: 0
+        },
+        methods:{
+          handleClick(){
+            this.count++
+          }
+        },
+        computed: {
+          computedCount() {
+            return this.count*2
+          }
+        }
+      })
+    style.
+      .my-class {
+        background-color:lightgreen;
+      }
+      .content {
+        display:flex;
+        flex: 1 1 0%;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }

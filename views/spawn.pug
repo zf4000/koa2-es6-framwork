@@ -1,0 +1,37 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title koa2-es6-framework
+  body
+    #app
+      div 调用接口执行mysqldump
+      div(class='content')
+        button(@click="testSpawn") 测试spawn
+        button(@click="testSpawn") 执行node-schedule
+      
+
+      
+    script.
+      new Vue({
+        el: '#app',
+        data: {
+          count: 0
+        },
+        methods:{
+          testSpawn(){
+            //- 请求接口执行mysqldump
+            const res = axios.post('/spawn').then(({data})=>{
+              console.log(data);
+            })
+          }
+        }
+      })
+    style.
+      .content {
+        display:flex;
+        flex: 1 1 0%;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }

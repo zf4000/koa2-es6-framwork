@@ -7,23 +7,12 @@ import http from "http";
  */
 
 const port = normalizePort(process.env.PORT || "3000");
-// app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
 import app from "../app.js";
-
-const server = http.createServer(app.callback());
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port, onListening);
-server.on("error", onError);
-// server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -71,14 +60,23 @@ function onError(error) {
   }
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
 // 日志logger
 import { useLogger } from "../hooks/useLogger.js";
 const logger = useLogger();
-function onListening() {
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+const server = http.createServer(app.callback());
+
+// 增加ws服务
+import { useSocketIo } from "../hooks/useSocketIo.js";
+const { bindHttpServer } = useSocketIo();
+bindHttpServer(server);
+
+server.listen(port, () => {
   const addr = server.address();
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   logger.info("Listening on " + bind);
-}
+});
+server.on("error", onError);

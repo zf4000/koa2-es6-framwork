@@ -18,7 +18,7 @@
     "editor.snippetSuggestions": "top"
   },
   "editor.formatOnSave": true,
-  "editor.formatOnType": true,
+  "editor.formatOnType": false,
   "editor.tabSize": 2,
   "editor.formatOnPaste": true,
   "editor.suggestSelection": "first",
@@ -32,7 +32,7 @@
     "strings": true
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.fontSize": 16,
 

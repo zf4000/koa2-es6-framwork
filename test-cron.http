@@ -1,0 +1,25 @@
+http://localhost:3000/cron
+
+### 添加定时任务
+POST http://localhost:3000/cron/add HTTP/1.1
+content-type: application/json
+
+{}
+
+### 输出定时任务对象
+POST http://localhost:3000/cron/dump HTTP/1.1
+content-type: application/json
+
+{}
+
+### 取消定时任务
+POST http://localhost:3000/cron/cancel HTTP/1.1
+content-type: application/json
+
+{"name": "task2"}
+
+### 修改定时任务
+POST http://localhost:3000/cron/update HTTP/1.1
+content-type: application/json
+
+{}

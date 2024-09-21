@@ -1,0 +1,42 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios_1.3.6.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title koa2-es6-framework
+  body
+    #app
+      div(class='msg') 定时任务测试页面
+          li 参考:https://github.com/node-schedule/node-schedule
+          li 观察任务执行结果
+      div(class='content')        
+        //- button(@click="add1") 创建计划任务(1分钟一次)
+        //- button(@click="add2") 创建计划任务(2分钟一次)
+        //- button(@click="add3") 创建计划任务-1分钟1次,并5秒后第一次执行
+
+    script.
+      new Vue({
+        el: '#app',
+        data: {
+          count: 0
+        },
+        methods:{
+          add1(){
+            axios.post('/cron').then(({data})=>{
+              console.log(data);
+            })
+          },
+          add2(){},
+          add3(){}
+        }
+      })
+    style.
+      .content {
+        display:flex;
+        flex: 1 1 0%;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .msg div {
+        padding-left:10px;
+      }
