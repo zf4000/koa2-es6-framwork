@@ -10,7 +10,7 @@ Content-Type : application/json
 
 {
   "id":"clientId",
-  "msg":"message from server"
+  "msg":"message from server" 
 }
 
 ### 得到服务端的nsp结构

@@ -61,18 +61,6 @@ router.post("/cron/add", async (ctx, next) => {
   console.log("* * * * * add,任务会在每小时的每分钟的0秒都会执行一次");
   schedule.scheduleJob("task1", "* * * * *", function () {
     console.log(`1-计划任务启动`);
-    const promise = () => {
-      return new Promise((resolve, reject) => {
-        resolve();
-      });
-    };
-    promise().then((res) => {
-      simulateResourceIntensiveTask();
-      console.log("promise over");
-    });
-    console.log("after promise");
-
-    // simulateResourceIntensiveTask();// 如果是一个耗时长的任务,会阻塞
   });
 
   console.log("*/2 * * * * add,每2分钟执行一次");
@@ -90,17 +78,6 @@ router.post("/cron/add", async (ctx, next) => {
       console.log("Time for tea!");
     }
   );
-
-  // 模拟一个一直占用资源的耗时任务,实测下来会阻塞
-  function simulateResourceIntensiveTask() {
-    console.log("开始执行资源密集型任务...");
-    // 模拟一个一直占用 CPU 资源的循环
-    let counter = 0;
-    while (counter < 100000000000) {
-      counter++;
-    }
-    console.log("资源密集型任务完成！");
-  }
   ctx.body = { success: true, msg: "cron ok" };
 });
 // 输出定时任务
