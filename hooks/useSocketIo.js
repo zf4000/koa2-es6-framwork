@@ -66,15 +66,6 @@ export const useSocketIo = () => {
   };
 
   // 得到服务器端所有的命名空间的层级结构
-  /*
-    [
-      {name,rooms:[
-        {name,sockets:[
-          {id}
-        ]}
-      ]}
-    ]
-  */
   const getIoLevel = () => {
     const io = getIo();
     const nsp = [];

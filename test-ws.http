@@ -17,13 +17,4 @@ Content-Type : application/json
 POST http://localhost:3000/ws/getNspLevel HTTP/1.1
 Content-Type : application/json
 
-{
-}
-
-### 服务端广播消息
-
-### 客户端推送消息到服务端
-
-### 客户端推送消息到其他客户端
-
-### 发现新的盘头通知到客户端
+{}
