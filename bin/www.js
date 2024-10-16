@@ -12,7 +12,7 @@ const port = normalizePort(process.env.PORT || "3000");
  * Create HTTP server.
  */
 
-import app from "../app.js";
+import app, { logger } from "../app.js"; //跨域,载入中间件,静态资源,路由等
 
 /**
  * Normalize a port into a number, string, or false.
@@ -37,7 +37,6 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== "listen") {
     throw error;
@@ -60,14 +59,11 @@ function onError(error) {
   }
 }
 
-// 日志logger
-import { useLogger } from "../hooks/useLogger.js";
-const logger = useLogger();
-
 /**
  * Listen on provided port, on all network interfaces.
  */
 const server = http.createServer(app.callback());
+server.on("error", onError);
 
 // 增加ws服务
 import { useSocketIo } from "../hooks/useSocketIo.js";
@@ -77,7 +73,6 @@ createSocketServer(); //自动创建server
 
 server.listen(port, () => {
   const addr = server.address();
-  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  logger.info("Listening on " + bind);
+  const bind = typeof addr === "string" ? "pipe " + addr : "端口 " + addr.port;
+  logger.info("服务启动完成,监听: " + bind);
 });
-server.on("error", onError);

@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { logger } from "../app.js";
 let _httpServer = null;
 let _io = null;
 
@@ -54,7 +55,9 @@ export const useSocketIo = () => {
     });
     //io实例创建后,会自动生成一个虚拟js文件: http://localhost:3000/socket.io/socket.io.js,用来在html页面中作为js资源加载,这使得客户端连接异常简单
 
-    console.log("socket server created");
+    logger.info(
+      "socket.io服务端创建成功,可以访问 http://localhost:3000/ws/client 来进行测试学习"
+    );
     _io = io;
 
     // 初始化默认命名空间

@@ -1,9 +1,15 @@
 import Koa from "koa";
 const app = new Koa();
 
+// 日志logger
+import { useLogger } from "./hooks/useLogger.js";
+export const logger = useLogger();
+logger.info("日志服务启动完成");
+
 //允许跨域
 import koa2 from "koa2-cors";
 app.use(koa2());
+logger.info("跨域设置完成");
 
 // 获取 __dirname 的 ESM 写法
 import { fileURLToPath } from "node:url";
@@ -13,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // nodejs错误处理
 import { useErrorHandler } from "./hooks/useErrorHandler.js";
 useErrorHandler(app);
+logger.info("错误捕获设置完成");
 
 // middlewares
 import bodyparser from "koa-bodyparser";
@@ -32,6 +39,7 @@ app.use(
     // headers: { "X-Hello": "World" }, // 自定义响应头
   })
 );
+logger.info("json输出美化设置完成");
 
 // 每次路由请求在控制台打印日志
 // import koaLogger from "koa-logger";
@@ -40,6 +48,7 @@ app.use(
 // 静态资源
 import _static from "koa-static";
 app.use(_static(__dirname + "/public"));
+logger.info("静态资源路径设置完成");
 
 // 定义模板引擎类型和模板路径
 import views from "koa-views";
@@ -48,6 +57,7 @@ app.use(
     extension: "pug",
   })
 );
+logger.info("pug模板引擎设置完成");
 
 // 路由请求在控制台显示日志
 // app.use(async (ctx, next) => {
@@ -61,5 +71,11 @@ app.use(
 import useRoute from "./hooks/useRoute.js";
 const { loadAllRoute } = useRoute();
 loadAllRoute(app);
+logger.info("路由载入完成");
+
+// 启动cron
+import { useCron } from "./hooks/useCron.js";
+useCron();
+logger.info("cron任务载入完成");
 
 export default app;

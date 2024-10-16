@@ -11,11 +11,15 @@ const nodejsErrorHandler = () => {
   process.on("uncaughtException", (error) => {
     // 异常处理代码
     logger.error("致命错误uncaughtException:", error);
+    // 处理错误后立即退出进程
+    process.exit(1);
   });
 
   process.on("unhandledRejection", (error) => {
     // 异常处理代码
     logger.error("致命错误 unhandledRejection:", error);
+    // 处理错误后立即退出进程
+    process.exit(1);
   });
 };
 

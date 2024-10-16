@@ -1,0 +1,5 @@
+### 完整测试请访问 http://localhost:3000/ws/client ,以下可以得到服务端的命名空间nsp结构
+POST http://localhost:3000/ws/getNspLevel HTTP/1.1
+Content-Type : application/json
+
+{}
