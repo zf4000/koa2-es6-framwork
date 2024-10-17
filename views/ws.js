@@ -42,8 +42,11 @@ new Vue({
     };
   },
   mounted() {
+    //- 服务端启动需要时间,这里延迟是为了等待服务端创建完成,
     //- 自动创建一个client
-    this.createClient("/", "jeff room");
+    setTimeout(() => {
+      this.createClient("/", "jeff room");
+    }, 2000);
     //- registerEvent.bind(this);
   },
   methods: {

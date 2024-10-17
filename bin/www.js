@@ -65,9 +65,9 @@ function onError(error) {
 const server = http.createServer(app.callback());
 server.on("error", onError);
 
-// 增加ws服务
-import { useSocketIo } from "../hooks/useSocketIo.js";
-const { bindHttpServer, createSocketServer } = useSocketIo();
+// 增加ws服务,并和http使用同一个端口3000
+import socketIo from "../hooks/useSocketIo.js";
+const { bindHttpServer, createSocketServer } = socketIo;
 bindHttpServer(server);
 createSocketServer(); //自动创建server
 

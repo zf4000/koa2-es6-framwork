@@ -30,11 +30,11 @@ const initNamespace = (nsp, cb) => {
       console.log(`${rootPath}/${socket.id} get message`, data);
       // console.log("Received message:", data);
     });
-    // 回调,可声明其他事件
-    cb?.(socket);
   });
+  // 回调,可声明其他事件
+  cb?.();
 };
-export const useSocketIo = () => {
+const useSocketIo = () => {
   //将socket server和http服务绑在一起,
   //绑定成功后会创建虚拟js文件,方便网页客户端作为js资源载入
   const bindHttpServer = (httpServer) => {
@@ -62,10 +62,15 @@ export const useSocketIo = () => {
 
     // 初始化默认命名空间
     initNamespace("/", (socket) => {
-      console.log("/命名空间初始化成功回调");
+      console.log("/ 命名空间初始化成功回调");
     });
     // 增加新的nsp,每个nsp有独立的事件
-    initNamespace("jeff");
+    initNamespace("jeff", () => {
+      console.log("/jeff 命名空间创建ok");
+    });
+    initNamespace("dingding/zhizao", () => {
+      console.log("钉钉织造计划命名空间创建ok");
+    });
   };
 
   // 得到服务器端所有的命名空间的层级结构
@@ -113,9 +118,10 @@ export const useSocketIo = () => {
     return clientIds;
   };
 
-  // 广播消息
+  // 广播消息,默认命名空间为 /
   const broadcast = (msg) => {
-    _io.emit("message", msg);
+    _io.emit("$message", msg);
+    // 等同于 broadcastNsp("/", msg);
   };
   return {
     createSocketServer,
@@ -147,3 +153,5 @@ export const useSocketIo = () => {
     },
   };
 };
+
+export default useSocketIo();

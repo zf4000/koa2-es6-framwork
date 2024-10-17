@@ -41,10 +41,6 @@ app.use(
 );
 logger.info("json输出美化设置完成");
 
-// 每次路由请求在控制台打印日志
-// import koaLogger from "koa-logger";
-// app.use(koaLogger());
-
 // 静态资源
 import _static from "koa-static";
 app.use(_static(__dirname + "/public"));

@@ -2,9 +2,11 @@ import koaRouter from "koa-router";
 const router = koaRouter();
 
 // 创建ws server
-import { useSocketIo } from "../hooks/useSocketIo.js";
+import socketIo from "../hooks/useSocketIo.js";
 const { broadcast, getIoLevel, getScocket, broadcastNsp, broadcastRoom } =
-  useSocketIo();
+  socketIo;
+// const  =
+//   useSocketIo();
 
 // 得到服务端的层级结构
 router.post("/ws/getNspLevel", (ctx) => {
