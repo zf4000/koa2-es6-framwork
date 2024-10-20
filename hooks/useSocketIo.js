@@ -159,6 +159,7 @@ const useSocketIo = (httpServer) => {
   return { publish };
 };
 
+// 测试用例
 setTimeout(() => {
   // publish({ nsp: "/compDingding" }, ["盘头1", "盘头2"]);//向命名空间内容所有client发消息
   // publish({ nsp: "/compDingding", room: _room }, ["盘头1", "盘头2"]); //向房间所有客户端发消息
