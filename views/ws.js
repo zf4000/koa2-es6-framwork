@@ -72,7 +72,7 @@ new Vue({
           //- 通知服务器换房间
           roomId && socket.emit("$changeRoom", roomId);
           //- 重新获取nsp
-          this.getServerNsp();
+          // this.getServerNsp();
         },
       ]);
     },

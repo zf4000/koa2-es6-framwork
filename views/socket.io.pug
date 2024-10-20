@@ -1,0 +1,54 @@
+html
+  head
+    script(src='/javascripts/vue_2.5.16.min.js')
+    script(src='/javascripts/axios.js')
+    //- soocket.io启动后会自动提供js客户端js
+    script(src='/socket.io/socket.io.js')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    title socket.io demo
+  body
+    #app
+      div socket:{{socketObj}}
+      div 订阅的新消息:
+        div(v-for="msg,index in newMessage" :key="index")
+          li {{msg}}
+      
+    script.
+      const _nsp = '/compDingding';
+      const _channel="";
+      const _room = "";
+      const _events = ['$message'];//需要监听的事件
+      new Vue({
+        el: '#app',
+        data: {
+          socketObj:{id:'',nsp:''},
+          newMessage:['初始消息','初始消息2']
+        },
+        mounted(){
+          if(!window.io) {
+            alert('未发现socket服务开启');
+            return;
+          }
+          const socket = io(_nsp);
+          socket.on('connect',()=>{
+            this.socketObj.id = socket.id;
+            this.socketObj.nsp = socket.nsp;
+          });
+          _events.forEach(evt=>{
+            socket.on(evt,(data)=>{
+              console.log(`${evt}事件监听到消息:`,data);
+              this.newMessage = data;
+            });
+          })
+          
+        },
+        methods:{
+          handleClick(){
+            this.count++
+          }
+        }
+      })
+    style.
+      .my-class {
+        background-color:lightgreen;
+      }

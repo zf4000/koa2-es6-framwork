@@ -3,3 +3,9 @@ POST http://localhost:3000/dingding/getData HTTP/1.1
 Content-Type : application/json
 
 {}
+
+### spawn
+POST http://localhost:3000/spawn HTTP/1.1
+Content-Type : application/json
+
+{}
