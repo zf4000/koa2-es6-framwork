@@ -8,6 +8,7 @@ html
     title socket.io demo
   body
     #app
+      button(@click='publisTest') 模拟服务器发布消息
       div socket:{{socketObj}}
       div 订阅的新消息:
         div(v-for="msg,index in newMessage" :key="index")
@@ -49,8 +50,8 @@ html
           
         },
         methods:{
-          handleClick(){
-            this.count++
+          publisTest(){
+            axios.get('/socketio/test');
           }
         }
       })
