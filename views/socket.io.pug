@@ -14,7 +14,6 @@ html
           li {{msg}}
       
     script.
-      const _nsp = '/compDingding';
       const _channel="";
       const _room = "";
       const _events = ['$message'];//需要监听的事件
@@ -29,10 +28,17 @@ html
             alert('未发现socket服务开启');
             return;
           }
-          const socket = io(_nsp);
+          //- nsp地址:http://localhost:3000/nsp-dingding 可以简写成 nsp-dingding
+          const socket = io('/nsp-dingding');//服务器启用了动态命名空间,必须以nsp-开头
+
           socket.on('connect',()=>{
             this.socketObj.id = socket.id;
             this.socketObj.nsp = socket.nsp;
+            console.log('连接成功',socket.id)
+          });
+          socket.on("connect_error", (error) => {
+            console.error(error);
+            throw new Error('客户端socket连接失败');
           });
           _events.forEach(evt=>{
             socket.on(evt,(data)=>{

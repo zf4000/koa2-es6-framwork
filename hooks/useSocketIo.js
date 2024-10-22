@@ -1,9 +1,17 @@
 import { Server } from "socket.io";
-import { logger } from "../app.js";
-let _httpServer = null;
+import { useLogger } from "./useLogger.js";
+const logger = useLogger();
+let _isBind = false;
 let _io = null;
-const _room = "zhizaoChejian";
-const _nspNames = ["/", "compDingding", "compChaoren"];
+
+/**
+ * 客户端连接后,需要迁入的房间
+ * 为简化逻辑,一般不需要,
+ * 以下场景可能用到:
+ * 新消息下发给某个部门的人,按部门建立房间
+ * 待完善,
+ */
+const _room = null;
 const _clientEvents = ["$message"]; //客户端event
 
 //遍历所有的nsp,找到指定的socket客户端
@@ -56,8 +64,8 @@ const getAllNspDesc = () => {
 
 /**
  *
- * @param {发送对象位置} target {nsp, room, clientId, channel}
- * @param {消息内容} msg string
+ * @param {object} target 配置项{nsp, room, clientId, channel}
+ * @param {string} msg 消息内容
  * @returns
  */
 const publish = (target, msg) => {
@@ -105,68 +113,90 @@ const publish = (target, msg) => {
 };
 
 const useSocketIo = (httpServer) => {
+  if (_isBind && httpServer) {
+    throw new Error("socket server已经创建过了,禁止重复绑定");
+  }
   //将socket server和http服务绑在一起,
   //绑定成功后会创建虚拟js文件,方便网页客户端作为js资源载入
   if (httpServer) {
-    if (_httpServer !== null) {
-      throw new Error("禁止重复绑定");
-    }
-    _httpServer = httpServer;
-
-    // createSocketServer();
-    const io = new Server(_httpServer, {
+    const io = new Server(httpServer, {
       /* options */
     });
+    io.on("connection", (socket) => {
+      throw new Error("客户端必须使用 io(`/nsp-xxx`) 进行连接");
+    });
     _io = io;
+    _isBind = true;
     logger.info(
-      "socket.io服务端创建成功,可以访问 http://localhost:3000/socketio 来进行测试学习"
+      "socket.io服务端创建成功(客户端必须使用io('/nsp-xxx')连接动态命名空间)"
     );
+    logger.info("可以访问 http://localhost:3000/socketio 来进行测试学习");
 
     //命名空间初始化,在每个空间有新的client_socket连接时,注册的每个client的事件(频道)
+    io.of(/^\/nsp-\S+$/).on("connection", (socket) => {
+      const nspName = socket.nsp.name;
+      console.log(
+        `${nspName}/${socket.id} 已连接,总连接数: ${
+          io.of(nspName).sockets.size
+        }`
+      );
 
-    _nspNames.forEach((nsp) => {
-      io.of(nsp).on("connection", (socket) => {
-        const rootPath = nsp == "/" ? "" : `/${nsp}`;
-        console.log(`${rootPath}/${socket.id} 已连接`);
+      // 离开原放假,进入设置房间,---待完善
+      if (_room) {
+        socket.leave(socket.id);
+        socket.join(_room);
+        console.log(`将${socket.id}移入房间${_room}`);
+      }
 
-        // 离开原放假,进入设置房间,
-        if (_room) {
-          socket.leave(socket.id);
-          socket.join(_room);
-          console.log(`将${socket.id}移入房间${_room}`);
-        }
-
-        // 输出整体结构:
+      // 输出整体结构:
+      console.log(getAllNspDesc());
+      // 失联时触发
+      socket.on("disconnect", (reason) => {
+        socket.removeAllListeners();
+        console.log(
+          `${nspName}/${socket.id} 断开连接,原因:${reason},总连接数: ${
+            io.of(nspName).sockets.size
+          }`
+        );
         console.log(getAllNspDesc());
-        // 失联时触发
-        socket.on("disconnect", (reason) => {
-          console.log(`${rootPath}/${socket.id} 断开连接`, reason);
-          console.log(getAllNspDesc());
-        });
+      });
 
-        // ============ 监听客户端发布的消息 ==================
-        _clientEvents.forEach((evt) => {
-          // 收到消息事件
-          socket.on(evt, (data) => {
-            console.log(`${rootPath}/${socket.id}@${evt} get message:`, data);
-          });
+      // ============ 监听客户端发布的消息 ==================
+      _clientEvents.forEach((evt) => {
+        // 收到消息事件
+        socket.on(evt, (data) => {
+          console.log(`${nspName}/${socket.id}@${evt} get message:`, data);
         });
       });
     });
-    console.log(`已注册命名空间:`, io._nsps.keys());
   }
 
-  return { publish };
+  return { publish, getIo };
 };
-
-// 测试用例
-setTimeout(() => {
-  // publish({ nsp: "/compDingding" }, ["盘头1", "盘头2"]);//向命名空间内容所有client发消息
-  // publish({ nsp: "/compDingding", room: _room }, ["盘头1", "盘头2"]); //向房间所有客户端发消息
-
-  //向某个具体的client发消息
+const test = () => {
   const clientId = getIo().of("/compDingding").sockets.keys().next().value;
-  // publish({ nsp: "/compDingding", clientId }, ["盘头1", "盘头2"]);//指定nsp clientId
-  publish({ clientId }, ["盘头1", "盘头2"]); //只指定clientId
-}, 2000);
+
+  // 测试用例:向命名空间内容所有client发消息
+  console.log("向命名空间内容所有client发消息");
+  publish({ nsp: "/compDingding" }, ["向命名空间内容所有client发消息"]);
+
+  // 测试用例:向房间所有客户端发消息
+  console.log("向房间所有客户端发消息");
+  publish({ nsp: "/compDingding", room: _room }, ["向房间所有客户端发消息"]);
+
+  // 测试用例:向命名空间内某个具体的client发消息
+
+  console.log("向命名空间内某个具体的client发消息", clientId);
+  publish({ nsp: "/compDingding", clientId }, [
+    "向命名空间内某个具体的client发消息",
+  ]);
+
+  // 测试用例:向某个client发消息
+  console.log("向某个client发消息,需要遍历定位nsp", clientId);
+  publish({ clientId }, ["向某个client发消息,需要遍历定位nsp"]);
+};
+setTimeout(() => {
+  test();
+}, 4000);
+
 export default useSocketIo;
