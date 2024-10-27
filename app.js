@@ -70,8 +70,11 @@ loadAllRoute(app);
 logger.info("路由载入完成");
 
 // 启动cron
+import config from "./config/default.config.js";
 import { useCron } from "./hooks/useCron.js";
-useCron();
-logger.info("cron任务载入完成");
+if (config.enableCron) {
+  useCron();
+  logger.info("cron任务载入完成");
+}
 
 export default app;

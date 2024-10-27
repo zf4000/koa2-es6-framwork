@@ -72,7 +72,8 @@ server.on("error", onError);
 // createSocketServer(); //自动创建server
 
 import useSocketIo from "../hooks/useSocketIo.js";
-useSocketIo(server);
+import config from "../config/default.config.js";
+config.enableSocket && useSocketIo(server);
 
 server.listen(port, () => {
   const addr = server.address();
